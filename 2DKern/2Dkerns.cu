@@ -2,7 +2,7 @@
 //#include <math>
 #include "math_constants.h"
 
-#define KERNEL_RADIUS 5
+#define KERNEL_RADIUS 8
 #define TILE_W 16
 
 __global__ void kernel(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel, int kernSize)
@@ -63,45 +63,56 @@ __global__ void kernelShared(unsigned short* input_image, unsigned short* output
 		else
 			cache[threadIdx.x][threadIdx.y] = input_image[index-KERNEL_RADIUS-width*KERNEL_RADIUS];
 
-		/*x = index_x+KERNEL_RADIUS;
+		x = index_x+KERNEL_RADIUS;
 		y = index_y-KERNEL_RADIUS;
 		if( x >= width-1 || y < 0)
 			cache[threadIdx.x + blockDim.x][threadIdx.y] = 0;
 		else
 			cache[threadIdx.x + blockDim.x][threadIdx.y] = input_image[index+KERNEL_RADIUS-width*KERNEL_RADIUS];
-		*/
+		
+
 
 		x = index_x-KERNEL_RADIUS;
+
 		y = index_y+KERNEL_RADIUS;
 		if( x < 0 || y >= height)
 			cache[threadIdx.x][threadIdx.y + blockDim.y] = 0;
 		else
 			cache[threadIdx.x][threadIdx.y + blockDim.y] = input_image[index-KERNEL_RADIUS+width*KERNEL_RADIUS];
 		
-		/*x = index_x+KERNEL_RADIUS;
+		x = index_x+KERNEL_RADIUS;
+
 		y = index_y+KERNEL_RADIUS;
 		if( x >= width || y >= height)
 			cache[threadIdx.x + blockDim.x][threadIdx.y + blockDim.y] = 0;
 		else
 			cache[threadIdx.x + blockDim.x][threadIdx.y + blockDim.y] = input_image[index+KERNEL_RADIUS+width*KERNEL_RADIUS];
-		*/
-
+		
 		__syncthreads();
-		output_image[index] = input_image[index];
+		//output_image[index] = input_image[index];
 
-		/*float sum = 0;
+		float sum = 0.0;
 
 		x = KERNEL_RADIUS + threadIdx.x;
 		y = KERNEL_RADIUS + threadIdx.y;
-		for(int i = -KERNEL_RADIUS; i<=KERNEL_RADIUS; ++i)
+		for(int i = -KERNEL_RADIUS;i<=KERNEL_RADIUS;++i)
+		{
+			sum += cache[x+i][y]*d_Kernel[KERNEL_RADIUS+i];
+		}
+		for(int j = -KERNEL_RADIUS;j<=KERNEL_RADIUS;++j)
+		{
+			sum += cache[x][y+j]*d_Kernel[KERNEL_RADIUS+j];
+		}
+		/*for(int i = -KERNEL_RADIUS; i<=KERNEL_RADIUS; ++i)
 		{
 			for(int j = -KERNEL_RADIUS; i<=KERNEL_RADIUS; ++j)
 			{
-				sum += cache[x+i][y+j]*d_Kernel[KERNEL_RADIUS+i]*d_Kernel[KERNEL_RADIUS+j];
+				//sum += cache[x+i][y+j]*d_Kernel[KERNEL_RADIUS+i]*d_Kernel[KERNEL_RADIUS+j];
+				sum += 4500*d_Kernel[KERNEL_RADIUS+j];
 			}
-		}
+		}*/
 		
-		output_image[index] = sum;*/	
+		output_image[index] = unsigned short(sum);	
 	
 }
 
@@ -117,7 +128,7 @@ int main(void)
 
 
 	int num_bytes = num_elements_x*num_elements_y*sizeof(unsigned short);
-	int kern_bytes = kernSize*kernSize*sizeof(float);
+	int kern_bytes = kernSize*sizeof(float);
 
 	FILE *fin = fopen("input.raw","r");
 	if(fin==NULL)
