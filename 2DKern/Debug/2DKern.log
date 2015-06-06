@@ -1,4 +1,4 @@
-﻿Build started 5/8/2015 5:38:18 PM.
+﻿Build started 6/5/2015 5:23:29 PM.
      1>Project "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2DKern.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\2DKern.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -8,7 +8,7 @@
        Skipping target "AddCudaCompilePropsDeps" because all output files are up-to-date with respect to the input files.
        CudaBuild:
          Compiling CUDA source file 2Dkerns.cu...
-         cmd.exe /C "C:\Users\plagon\AppData\Local\Temp\tmp29b6e8ce645b4b7994c9e86a26ccc2a1.cmd"
+         cmd.exe /C "C:\Users\plagon\AppData\Local\Temp\tmp12cd2b11422644d89b2db50bb905c42c.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include"  -G   --keep-dir "Debug" -maxrregcount=0  --machine 32 --compile  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o "Debug\2Dkerns.cu.obj" "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2Dkerns.cu"
          
          C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include"  -G   --keep-dir "Debug" -maxrregcount=0  --machine 32 --compile  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o "Debug\2Dkerns.cu.obj" "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2Dkerns.cu" 
@@ -17,16 +17,16 @@
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(33): warning : pointless comparison of unsigned integer with zero
          
-         tmpxft_00001e68_00000000-2_2Dkerns.cudafe1.gpu
-         tmpxft_00001e68_00000000-7_2Dkerns.cudafe2.gpu
+         tmpxft_00001e08_00000000-2_2Dkerns.cudafe1.gpu
+         tmpxft_00001e08_00000000-7_2Dkerns.cudafe2.gpu
          2Dkerns.cu
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(26): warning : pointless comparison of unsigned integer with zero
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(33): warning : pointless comparison of unsigned integer with zero
          
-         tmpxft_00001e68_00000000-2_2Dkerns.cudafe1.cpp
-         tmpxft_00001e68_00000000-12_2Dkerns.ii
-         Deleting file "tmpxft_00001e68_00000000-8_2Dkerns.cpp3.o".
+         tmpxft_00001e08_00000000-2_2Dkerns.cudafe1.cpp
+         tmpxft_00001e08_00000000-12_2Dkerns.ii
+         Deleting file "tmpxft_00001e08_00000000-8_2Dkerns.cpp3.o".
        ClCompile:
          All outputs are up-to-date.
        ManifestResourceCompile:
@@ -48,4 +48,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:03.91
+Time Elapsed 00:00:03.62
