@@ -3,7 +3,7 @@
 #include "math_constants.h"
 #include "windows.h"
 
-#define KERNEL_RADIUS 5
+#define KERNEL_RADIUS 4
 #define TILE_W 16
 
 __global__ void kernel(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel, int kernSize)
@@ -118,117 +118,6 @@ __global__ void kernelShared(unsigned short* input_image, unsigned short* output
 
 __global__ void kernelSharedCustom(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel)
 {
-		int x;
-		int y;
-		int index_x = blockIdx.x*blockDim.x + threadIdx.x;
-		int index_y = blockIdx.y*blockDim.y + threadIdx.y;
-		//map the two 2D indices to a single linear 1D index
-		int grid_width = gridDim.x*blockDim.x;
-		int index = index_y*grid_width + index_x;
-
-		__shared__ float cache[TILE_W+(2*KERNEL_RADIUS)][TILE_W+(2*KERNEL_RADIUS)];
-
-		cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = input_image[index];
-
-		
-		if(threadIdx.x<KERNEL_RADIUS && threadIdx.y<KERNEL_RADIUS)
-		{
-			x = index-KERNEL_RADIUS;
-			y = index-KERNEL_RADIUS;
-			if(x<0)
-				cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS] = input_image[index-KERNEL_RADIUS];
-			if(y<0)
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y] = 0;
-			else
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y] = input_image[index-width*KERNEL_RADIUS];
-			if(x<0||y<0)
-				cache[threadIdx.x][threadIdx.y] = 0;
-			else
-				cache[threadIdx.x][threadIdx.y] = input_image[index-KERNEL_RADIUS -width*KERNEL_RADIUS];
-		}
-		else if(threadIdx.x<KERNEL_RADIUS)
-		{
-			x = index-KERNEL_RADIUS;
-			if(x>0)
-				cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS] = input_image[index-KERNEL_RADIUS];
-			else
-				cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS] = 0;
-		}
-		else if(threadIdx.y<KERNEL_RADIUS)
-		{
-			y = index-KERNEL_RADIUS;
-			if(y>0)
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y] = input_image[index-width*KERNEL_RADIUS];
-			else
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y] = 0;
-		}
-		else if(threadIdx.x>(blockDim.x-KERNEL_RADIUS)&& threadIdx.y>(blockDim.y-KERNEL_RADIUS))
-		{
-			x = index+KERNEL_RADIUS;
-			y = index+KERNEL_RADIUS;
-
-			if(x>=width)
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = input_image[index+KERNEL_RADIUS];
-			if(y>=height)
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = input_image[index+width*KERNEL_RADIUS];				
-			if(x>=width || y >=height)
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = input_image[index+KERNEL_RADIUS+width*KERNEL_RADIUS];
-		}
-		else if(threadIdx.x>(blockDim.x-KERNEL_RADIUS))
-		{
-			x = index+KERNEL_RADIUS;
-			if(x>=width)
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = input_image[index+KERNEL_RADIUS];
-		}
-		else if(threadIdx.y>(blockDim.x-KERNEL_RADIUS))
-		{
-			y = index+KERNEL_RADIUS;
-			if(x>=width || y >=height)
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = 0;
-			else
-				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = input_image[index+KERNEL_RADIUS+width*KERNEL_RADIUS];
-		}
-		
-		__syncthreads();
-		//output_image[index] = input_image[index];
-
-		float sum = 0.0;
-
-		x = KERNEL_RADIUS + threadIdx.x;
-		y = KERNEL_RADIUS + threadIdx.y;
-		for(int i = -KERNEL_RADIUS;i<=KERNEL_RADIUS;++i)
-		{
-			sum += cache[x+i][y]*d_Kernel[KERNEL_RADIUS+i];
-		}
-		for(int j = -KERNEL_RADIUS;j<=KERNEL_RADIUS;++j)
-		{
-			sum += cache[x][y+j]*d_Kernel[KERNEL_RADIUS+j];
-		}
-		/*for(int i = -KERNEL_RADIUS; i<=KERNEL_RADIUS; ++i)
-		{
-			for(int j = -KERNEL_RADIUS; i<=KERNEL_RADIUS; ++j)
-			{
-				//sum += cache[x+i][y+j]*d_Kernel[KERNEL_RADIUS+i]*d_Kernel[KERNEL_RADIUS+j];
-				sum += 4500*d_Kernel[KERNEL_RADIUS+j];
-			}
-		}*/
-		
-		output_image[index] = unsigned short(sum);
-}
-
-
-__global__ void kernelSharedCustomSeperable(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel)
-{
 	int x;
 	int y;
 	int index_x = blockIdx.x*blockDim.x + threadIdx.x;
@@ -296,6 +185,211 @@ __global__ void kernelSharedCustomSeperable(unsigned short* input_image, unsigne
 	for(int j = -KERNEL_RADIUS;j<=KERNEL_RADIUS;++j)
 	{
 		sum += cache2[x][y+j]*d_Kernel[KERNEL_RADIUS+j];
+	}
+	sum /=2;
+	output_image[index] = unsigned short(sum);
+}
+
+__global__ void kernelSharedCustom2(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel)
+{
+	int x;
+	int y;
+	int index_x = blockIdx.x*blockDim.x + threadIdx.x;
+	int index_y = blockIdx.y*blockDim.y + threadIdx.y;
+	//map the two 2D indices to a single linear 1D index
+	int grid_width = gridDim.x*blockDim.x;
+	int index = index_y*grid_width + index_x;
+
+	__shared__ float cache[TILE_W+(2*KERNEL_RADIUS)][TILE_W+(2*KERNEL_RADIUS)];
+	
+	cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS] = input_image[index];
+	
+	if(threadIdx.x<KERNEL_RADIUS)
+	{
+		x = index_x-KERNEL_RADIUS;
+		if (threadIdx.y<KERNEL_RADIUS)
+		{
+			y = index_y-KERNEL_RADIUS;
+			if(x<0 || y<0)
+				cache[threadIdx.x][threadIdx.y]=0;
+			else
+				cache[threadIdx.x][threadIdx.y] = input_image[index-KERNEL_RADIUS - width*KERNEL_RADIUS];
+		}
+		if (threadIdx.y>=(blockDim.y-KERNEL_RADIUS))
+		{
+			y = index_y+KERNEL_RADIUS;
+			if(x<0 || y>=height)
+				cache[threadIdx.x][threadIdx.y+2*KERNEL_RADIUS]=0;
+			else
+				cache[threadIdx.x][threadIdx.y+2*KERNEL_RADIUS] = input_image[index-KERNEL_RADIUS + width*KERNEL_RADIUS];
+		}
+		if(x<0)
+			cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS]=0;
+		else
+			cache[threadIdx.x][threadIdx.y+KERNEL_RADIUS] = input_image[index-KERNEL_RADIUS];
+	}		
+	if(threadIdx.x>=(blockDim.x-KERNEL_RADIUS))
+	{
+		x = index_x+KERNEL_RADIUS;
+
+		if(threadIdx.y<KERNEL_RADIUS)
+		{
+			y = index_y-KERNEL_RADIUS;
+			if(x>=width || y<0)
+				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y]=0;
+			else
+				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y]=input_image[index+KERNEL_RADIUS-width*KERNEL_RADIUS];
+		}
+		if (threadIdx.y>=height)
+		{
+			y = index_y+KERNEL_RADIUS;
+			if(x>=width || y>=(blockDim.x-KERNEL_RADIUS))
+				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS]=0;
+			else
+				cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = input_image[index+KERNEL_RADIUS + width*KERNEL_RADIUS];
+		}		
+		
+		if(x>=width)
+			cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS]=0;
+		else
+			cache[threadIdx.x+2*KERNEL_RADIUS][threadIdx.y+KERNEL_RADIUS]= input_image[index+KERNEL_RADIUS];
+		
+	}
+	if(threadIdx.y<KERNEL_RADIUS)
+	{
+		y = index_y-KERNEL_RADIUS;
+		if(y<0)
+			cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y]=0;
+		else
+			cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y] = input_image[index-width*KERNEL_RADIUS];
+	}	
+	if(threadIdx.y>=(blockDim.y-KERNEL_RADIUS))
+	{
+		y=index_y+KERNEL_RADIUS;
+		if(y>=height)
+			cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = 0;
+		else
+			cache[threadIdx.x+KERNEL_RADIUS][threadIdx.y+2*KERNEL_RADIUS] = input_image[index+width*KERNEL_RADIUS];
+	}
+
+	__syncthreads();
+	
+	//output_image[index] = input_image[index];
+	
+	float sum = 0.0;
+
+	x = KERNEL_RADIUS + threadIdx.x;
+	y = KERNEL_RADIUS + threadIdx.y;
+	for(int i = -KERNEL_RADIUS;i<=KERNEL_RADIUS;++i)
+	{
+		sum += cache[x+i][y]*d_Kernel[KERNEL_RADIUS+i];
+	}		
+	for(int j = -KERNEL_RADIUS;j<=KERNEL_RADIUS;++j)
+	{
+		sum += cache[x][y+j]*d_Kernel[KERNEL_RADIUS+j];
+	}
+	sum /=2;
+	output_image[index] = unsigned short(sum);
+}
+
+__global__ void kernelSharedCustomDynamic(unsigned short* input_image, unsigned short* output_image, int width, int height, float* d_Kernel, int kernRadius)
+{
+	int x;
+	int y;
+	int index_x = blockIdx.x*blockDim.x + threadIdx.x;
+	int index_y = blockIdx.y*blockDim.y + threadIdx.y;
+	//map the two 2D indices to a single linear 1D index
+	int grid_width = gridDim.x*blockDim.x;
+	int index = index_y*grid_width + index_x;
+	int cacheWidth = 2*kernRadius+threadIdx.x;
+
+	extern __shared__ float cache[];
+	cache[threadIdx.x+KERNEL_RADIUS + cacheWidth*(threadIdx.y+KERNEL_RADIUS)] = input_image[index];
+	
+	
+	if(threadIdx.x<KERNEL_RADIUS)
+	{
+		x = index_x-KERNEL_RADIUS;
+		if (threadIdx.y<KERNEL_RADIUS)
+		{
+			y = index_y-KERNEL_RADIUS;
+			if(x<0 || y<0)
+				cache[threadIdx.x+cacheWidth*threadIdx.y]=0;
+			else
+				cache[threadIdx.x+cacheWidth*threadIdx.y] = input_image[index-KERNEL_RADIUS - width*KERNEL_RADIUS];
+		}
+		if (threadIdx.y>=(blockDim.y-KERNEL_RADIUS))
+		{
+			y = index_y+KERNEL_RADIUS;
+			if(x<0 || y>=height)
+				cache[threadIdx.x+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)]=0;
+			else
+				cache[threadIdx.x+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)] = input_image[index-KERNEL_RADIUS + width*KERNEL_RADIUS];
+		}
+		if(x<0)
+			cache[threadIdx.x+cacheWidth*(threadIdx.y+KERNEL_RADIUS)]=0;
+		else
+			cache[threadIdx.x+cacheWidth*(threadIdx.y+KERNEL_RADIUS)] = input_image[index-KERNEL_RADIUS];
+	}		
+	if(threadIdx.x>=(blockDim.x-KERNEL_RADIUS))
+	{
+		x = index_x+KERNEL_RADIUS;
+
+		if(threadIdx.y<KERNEL_RADIUS)
+		{
+			y = index_y-KERNEL_RADIUS;
+			if(x>=width || y<0)
+				cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*threadIdx.y]=0;
+			else
+				cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*threadIdx.y]=input_image[index+KERNEL_RADIUS-width*KERNEL_RADIUS];
+		}
+		if (threadIdx.y>=(blockDim.y-KERNEL_RADIUS))
+		{
+			y = index_y+KERNEL_RADIUS;
+			if(x>=width || y>=height)
+				cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)]=0;
+			else
+				cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)] = input_image[index+KERNEL_RADIUS + width*KERNEL_RADIUS];
+		}		
+		
+		if(x>=width)
+			cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*(threadIdx.y+KERNEL_RADIUS)]=0;
+		else
+			cache[threadIdx.x+2*KERNEL_RADIUS+cacheWidth*(threadIdx.y+KERNEL_RADIUS)]= input_image[index+KERNEL_RADIUS];
+		
+	}
+	if(threadIdx.y<KERNEL_RADIUS)
+	{
+		y = index_y-KERNEL_RADIUS;
+		if(y<0)
+			cache[threadIdx.x+KERNEL_RADIUS+cacheWidth*threadIdx.y]=0;
+		else
+			cache[threadIdx.x+KERNEL_RADIUS+cacheWidth*threadIdx.y] = input_image[index-width*KERNEL_RADIUS];
+	}	
+	if(threadIdx.y>=(blockDim.y-KERNEL_RADIUS))
+	{
+		y=index_y+KERNEL_RADIUS;
+		if(y>=height)
+			cache[threadIdx.x+KERNEL_RADIUS+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)] = 0;
+		else
+			cache[threadIdx.x+KERNEL_RADIUS+cacheWidth*(threadIdx.y+2*KERNEL_RADIUS)] = input_image[index+width*KERNEL_RADIUS];
+	}
+
+	__syncthreads();
+	
+	//output_image[index] = input_image[index];
+	
+	float sum = 0.0;
+
+	x = KERNEL_RADIUS + threadIdx.x;
+	y = KERNEL_RADIUS + threadIdx.y;
+	for(int i = -KERNEL_RADIUS;i<=KERNEL_RADIUS;++i)
+	{
+		sum += cache[x+i+cacheWidth*y]*d_Kernel[KERNEL_RADIUS+i];
+	}		
+	for(int j = -KERNEL_RADIUS;j<=KERNEL_RADIUS;++j)
+	{
+		sum += cache[x+cacheWidth*(y+j)]*d_Kernel[KERNEL_RADIUS+j];
 	}
 	sum /=2;
 	output_image[index] = unsigned short(sum);
@@ -382,8 +476,23 @@ int main(void)
 	grid_size.y = num_elements_y/block_size.y;
 
 	//grid_size & block_size are passed as arguments to the triple chevrons
-	//kernel<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern,kernSize);
+	/*int sharedMemory = (block_size.x+2*KERNEL_RADIUS)*(block_size.y+2*KERNEL_RADIUS)*sizeof(float);
+	kernelSharedCustomDynamic<<<grid_size,block_size,sharedMemory>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern,KERNEL_RADIUS);
+	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
+	cudaMemcpy(host_array2,device_array_out,num_bytes,cudaMemcpyDeviceToHost);
+	FILE* fout = fopen("Dynamic-output.raw","wb");
+	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
+	fclose(fout);*/
 
+	
+	kernelSharedCustom2<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
+	cudaMemcpy(host_array2,device_array_out,num_bytes,cudaMemcpyDeviceToHost);
+	FILE* fout = fopen("Custom-SingleCache-output.raw","wb");
+	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
+	fclose(fout);
+
+	/*
 	//grid_size & block_size are passed as arguments to the triple chevrons
 	int numIts = 50;
 	double sum3 = 0.0;
@@ -393,7 +502,7 @@ int main(void)
 	{
 		printf("Custom %d\n",i);
 		QueryPerformanceCounter(&t1);
-		kernelSharedCustomSeperable<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+		kernelSharedCustom<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
 		QueryPerformanceCounter(&t2);
 		sum3 += (t2.QuadPart - t1.QuadPart) * 1000.0/ frequency.QuadPart;
 	}
@@ -427,7 +536,7 @@ int main(void)
 	FILE* fout2 = fopen("Standard-output2.raw","wb");
 	written = fwrite(host_array3,sizeof(unsigned short),num_bytes/2,fout2);
 	fclose(fout2);
-
+	*/
 
 	printf("\n");
 
