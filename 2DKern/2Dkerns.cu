@@ -301,7 +301,7 @@ __global__ void kernelSharedCustomDynamic(unsigned short* input_image, unsigned 
 	//map the two 2D indices to a single linear 1D index
 	int grid_width = gridDim.x*blockDim.x;
 	int index = index_y*grid_width + index_x;
-	int cacheWidth = 2*kernRadius+threadIdx.x;
+	int cacheWidth = 2*kernRadius+blockDim.x;
 
 	extern __shared__ float cache[];
 	cache[threadIdx.x+KERNEL_RADIUS + cacheWidth*(threadIdx.y+KERNEL_RADIUS)] = input_image[index];
@@ -484,25 +484,43 @@ int main(void)
 	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
 	fclose(fout);*/
 
-	
+	/*
 	kernelSharedCustom2<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
 	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
 	cudaMemcpy(host_array2,device_array_out,num_bytes,cudaMemcpyDeviceToHost);
 	FILE* fout = fopen("Custom-SingleCache-output.raw","wb");
 	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
-	fclose(fout);
+	fclose(fout);*/
 
 	/*
+	kernelSharedCustom<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
+	cudaMemcpy(host_array2,device_array_out,num_bytes,cudaMemcpyDeviceToHost);
+	FILE* fout = fopen("Custom-output.raw","wb");
+	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
+	fclose(fout);*/
+
+	/*
+	kernelShared<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
+	cudaMemcpy(host_array2,device_array_out,num_bytes,cudaMemcpyDeviceToHost);
+	FILE* fout = fopen("Standard-output.raw","wb");
+	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
+	fclose(fout);*/
+
+	
 	//grid_size & block_size are passed as arguments to the triple chevrons
 	int numIts = 50;
 	double sum3 = 0.0;
 	double sum2 = 0.0;
+	int sharedMemory = (block_size.x+2*KERNEL_RADIUS)*(block_size.y+2*KERNEL_RADIUS)*sizeof(float);
 	QueryPerformanceFrequency(&frequency);
 	for(int i = 0; i< numIts;i++)
 	{
-		printf("Custom %d\n",i);
+		printf("Dynamic %d\n",i);
 		QueryPerformanceCounter(&t1);
-		kernelSharedCustom<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+		//kernelSharedCustom<<<grid_size,block_size>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern);
+		kernelSharedCustomDynamic<<<grid_size,block_size,sharedMemory>>>(device_array_in,device_array_out,num_elements_x,num_elements_y,device_kern,KERNEL_RADIUS);
 		QueryPerformanceCounter(&t2);
 		sum3 += (t2.QuadPart - t1.QuadPart) * 1000.0/ frequency.QuadPart;
 	}
@@ -510,9 +528,9 @@ int main(void)
 
 	for(int i = 0; i< numIts; i++)
 	{
-		printf("Standard %d\n",i);
+		printf("Single-Cache %d\n",i);
 		QueryPerformanceCounter(&t1);
-		kernelShared<<<grid_size,block_size>>>(device_array_in2,device_array_out2,num_elements_x,num_elements_y,device_kern2);
+		kernelSharedCustom2<<<grid_size,block_size>>>(device_array_in2,device_array_out2,num_elements_x,num_elements_y,device_kern2);
 		QueryPerformanceCounter(&t2);
 		sum2 += (t2.QuadPart - t1.QuadPart) * 1000.0/ frequency.QuadPart;
 	}
@@ -522,21 +540,21 @@ int main(void)
 	sum2 /= numIts;
 	sum3 /= numIts;
 
-	printf("Standard processing average time: %f ms\n",sum2);
-	printf("Custom processing average time: %f ms\n",sum3);
+	printf("Single-Cache processing average time: %f ms\n",sum2);
+	printf("Dynamic processing average time: %f ms\n",sum3);
 	
 	printf("Cuda error: %s\n", cudaGetErrorString(cudaGetLastError()));
 
 	printf("Image downloaded from device!\n");
 
-	FILE* fout = fopen("Custom-output.raw","wb");
+	FILE* fout = fopen("Custom-Dynamic-output.raw","wb");
 	int written = fwrite(host_array2,sizeof(unsigned short),num_bytes/2,fout);
 	fclose(fout);
 
-	FILE* fout2 = fopen("Standard-output2.raw","wb");
+	FILE* fout2 = fopen("Custom-Single-output.raw","wb");
 	written = fwrite(host_array3,sizeof(unsigned short),num_bytes/2,fout2);
 	fclose(fout2);
-	*/
+	
 
 	printf("\n");
 

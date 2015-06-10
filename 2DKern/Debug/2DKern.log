@@ -1,4 +1,4 @@
-﻿Build started 6/10/2015 4:38:34 PM.
+﻿Build started 6/10/2015 4:52:38 PM.
      1>Project "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2DKern.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\2DKern.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -8,7 +8,7 @@
        Skipping target "AddCudaCompilePropsDeps" because all output files are up-to-date with respect to the input files.
        CudaBuild:
          Compiling CUDA source file 2Dkerns.cu...
-         cmd.exe /C "C:\Users\plagon\AppData\Local\Temp\tmpc6e7931000e445de99707220344dbe21.cmd"
+         cmd.exe /C "C:\Users\plagon\AppData\Local\Temp\tmpb3afbc837c0f4ffa82d202d976f09be9.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include"  -G   --keep-dir "Debug" -maxrregcount=0  --machine 32 --compile  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o "Debug\2Dkerns.cu.obj" "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2Dkerns.cu"
          
          C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\bin\nvcc.exe" -gencode=arch=compute_10,code=\"sm_10,compute_10\" --use-local-env --cl-version 2010 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin"  -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include"  -G   --keep-dir "Debug" -maxrregcount=0  --machine 32 --compile  -g   -DWIN32 -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Zi /RTC1 /MDd  " -o "Debug\2Dkerns.cu.obj" "C:\Users\plagon\Documents\Git-Workspace\temp\CudaTutorial\2DKern\2DKern\2Dkerns.cu" 
@@ -17,46 +17,31 @@
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(34): warning : pointless comparison of unsigned integer with zero
          
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(400): warning : variable "frequency" was declared but never referenced
-         
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t1" was declared but never referenced
-         
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t2" was declared but never referenced
-         
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t3" was declared but never referenced
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t4" was declared but never referenced
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(402): warning : variable "elapsedTime" was declared but never referenced
          
-         tmpxft_00001abc_00000000-2_2Dkerns.cudafe1.gpu
-         tmpxft_00001abc_00000000-7_2Dkerns.cudafe2.gpu
+         tmpxft_00001c84_00000000-2_2Dkerns.cudafe1.gpu
+         tmpxft_00001c84_00000000-7_2Dkerns.cudafe2.gpu
          2Dkerns.cu
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(27): warning : pointless comparison of unsigned integer with zero
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(34): warning : pointless comparison of unsigned integer with zero
          
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(400): warning : variable "frequency" was declared but never referenced
-         
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t1" was declared but never referenced
-         
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t2" was declared but never referenced
-         
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t3" was declared but never referenced
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning : variable "t4" was declared but never referenced
          
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(402): warning : variable "elapsedTime" was declared but never referenced
          
-         tmpxft_00001abc_00000000-2_2Dkerns.cudafe1.cpp
-         tmpxft_00001abc_00000000-12_2Dkerns.ii
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(400): warning C4101: 'frequency' : unreferenced local variable
+         tmpxft_00001c84_00000000-2_2Dkerns.cudafe1.cpp
+         tmpxft_00001c84_00000000-12_2Dkerns.ii
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(402): warning C4101: 'elapsedTime' : unreferenced local variable
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning C4101: 't2' : unreferenced local variable
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning C4101: 't3' : unreferenced local variable
-     1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning C4101: 't1' : unreferenced local variable
      1>C:/Users/plagon/Documents/Git-Workspace/temp/CudaTutorial/2DKern/2DKern/2Dkerns.cu(401): warning C4101: 't4' : unreferenced local variable
-         Deleting file "tmpxft_00001abc_00000000-8_2Dkerns.cpp3.o".
+         Deleting file "tmpxft_00001c84_00000000-8_2Dkerns.cpp3.o".
        ClCompile:
          All outputs are up-to-date.
        ManifestResourceCompile:
@@ -78,4 +63,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.26
+Time Elapsed 00:00:07.45
